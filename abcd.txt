@@ -1,0 +1,132 @@
+<?php
+
+	class Studentmodel extends CI_Model
+	{
+		
+		public function insertstudent($studdata,$uid)
+		{
+			$a = $this->db->insert('student', $studdata);
+			$sid = $this->db->insert_id();
+			$comm_data=['student_id'=>$sid,'franchise_id'=>$uid,'commission'=>'3000'];
+			$abc = $this->db->insert('commission', $comm_data);
+			return $a;
+		}
+
+
+
+		public function students_list( $limit, $offset )
+		{
+			$user_id = $this->session->userdata('user_id');
+			$query = $this->db
+								->select("*")
+								->from('student')
+								->where('user_id', $user_id)
+								->limit( $limit, $offset )
+								->get();
+								/*print_r($this->db->last_query());
+								exit();*/
+			return $query->result();
+		}
+
+		public function all_students_list( $limit, $offset )
+		{
+			$query = $this->db
+								->select("*")
+								->from('student')
+								->limit( $limit, $offset )
+								->get();
+			return $query->result();
+		}
+
+		public function fran_students_list( $limit, $offset ,$per_page )
+		{
+			print_r($limit);
+			$offset = ($limit * $per_page) - $limit;
+			print_r($offset);
+			$user_id = $this->session->userdata('user_id');
+			$query = $this->db
+								->select("*")
+								->from('student')
+								->where('user_id', $user_id)
+								->where('id', $limit)
+								->limit( $offset,$limit )
+								->get();
+								print_r($this->db->last_query());
+			return $query->result();
+		}
+
+		public function num_rows()
+		{
+			$user_id = $this->session->userdata('user_id');
+			$query = $this->db
+								->select(['firstname','lastname','email','created_at'])
+								->from('student')
+								->where('user_id', $user_id)
+								->get();
+			return $query->num_rows();
+		}
+
+		public function num_students()
+		{
+			$query = $this->db->query('SELECT * FROM student');
+			return $query->num_rows();
+		}
+
+		public function get_student($value)
+        {
+            $q=$this->db->select("*")
+                        ->where('id',$value)
+                        ->get('student');
+
+            return $q->row();
+            // print_r($q);
+        }
+
+        public function editstudent($id,$editstuddata)
+        {
+            # code..
+
+            return $this->db->where('id',$id)
+                    ->update('student', $editstuddata);
+        }
+
+        public function delete_stud($value)
+        {
+            return  $this->db->where('id', $value)
+            			    ->delete('student');
+        }
+
+        /*public function getRows($id = " ")
+		{
+	        $this->db->select('img_id,file_name');
+	        $this->db->from('image_files');
+	        if($id)
+	        {
+	            $this->db->where('id',$id);
+	            $query = $this->db->get();
+	            $result = $query->row_array();
+	        }
+	        else
+	        {
+	            $query = $this->db->get();
+	            $result = $query->result_array();
+	        }
+	        return !empty($result)?$result:false;
+    	}
+
+        public function get_multi_images($value)
+        {     
+                $q = $this->db->where('id', $value)
+                            ->get("image_files");
+				return $q->result();
+        }
+
+        public function insert($data = array())
+    	{
+    		// print_r($data);
+    		// exit();
+	        $insert = $this->db->insert_batch('image_files',$data);
+	        return $insert?true:false;
+    	}*/
+	}
+?>
